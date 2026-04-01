@@ -55,7 +55,7 @@ const QUESTIONS = [
 // Estado do jogo
 let currentQuestion = 0;
 let score = 0;
-let timeLeft = 21;
+let timeLeft = 302.400;
 let timerInterval = null;
 let quizActive = true;
 let answerSelected = false;
@@ -139,7 +139,7 @@ function toggleMusic() {
 function initQuiz() {
     currentQuestion = 0;
     score = 0;
-    timeLeft = 21;
+    timeLeft =  302.400;
     quizActive = true;
     answerSelected = false;
     
