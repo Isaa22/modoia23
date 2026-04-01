@@ -129,7 +129,7 @@ function toggleMusic() {
 // FUNÇÃO PARA TOCAR MÚSICA DO MATUÊ (COLOQUE SEU ARQUIVO AQUI)
 function tocarMusicaMatue() {
     // TROQUE 'sua-musica.mp3' pelo nome do seu arquivo
-    const musica = new Audio('sua-musica.mp3');
+    const musica = new Audio('matue.mp3');
     musica.volume = 0.3;
     musica.play().catch(e => console.log('Arquivo não encontrado:', e));
 }
