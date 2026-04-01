@@ -74,7 +74,7 @@ function initMusic() {
     
     // Vamos usar um link de áudio do Matuê (você pode substituir pelo arquivo local)
     // Para usar arquivo local: 'musicas/matue-333.mp3'
-    audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
+    audio = new Audio('BACKSTAGE - Matuê - Topic (128k).mp3');
     // ⚠️ SUBSTITUA O LINK ACIMA POR UMA MÚSICA REAL DO MATUÊ!
     // Exemplo com arquivo local: audio = new Audio('matue-333.mp3');
     
