@@ -55,7 +55,7 @@ const QUESTIONS = [
 // Estado do jogo
 let currentQuestion = 0;
 let score = 0;
-let timeLeft = 302.400;
+let timeLeft = 259200; // 3 DIAS em segundos (3 x 24 x 60 x 60)
 let timerInterval = null;
 let quizActive = true;
 let answerSelected = false;
@@ -63,20 +63,14 @@ let answerSelected = false;
 // Elementos DOM
 const quizPanel = document.getElementById('quizPanel');
 
-// ========== SISTEMA DE MÚSICA REAL DO MATUÊ ==========
+// ========== SISTEMA DE MÚSICA ==========
 let audio = null;
 let isPlaying = false;
 
 function initMusic() {
-    // Criar elemento de áudio com música do Matuê
-    // OPÇÃO 1: Usar link do YouTube (embed) - Mais fácil para escola
-    // OPÇÃO 2: Baixar um trecho da música e colocar na pasta
-    
-    // Vamos usar um link de áudio do Matuê (você pode substituir pelo arquivo local)
-    // Para usar arquivo local: 'musicas/matue-333.mp3'
-    audio = new Audio('BACKSTAGE - Matuê - Topic (128k).mp3');
-    // ⚠️ SUBSTITUA O LINK ACIMA POR UMA MÚSICA REAL DO MATUÊ!
-    // Exemplo com arquivo local: audio = new Audio('matue-333.mp3');
+    // CORRIGIDO: nome simples sem espaços e sem caracteres especiais
+    // RENOMEIE SEU ARQUIVO DE MÚSICA PARA: "matue.mp3" e coloque na mesma pasta
+    audio = new Audio('matue.mp3');
     
     audio.loop = true;
     audio.volume = 0.3;
@@ -94,13 +88,9 @@ function playMusic() {
             isPlaying = true;
             const icon = document.querySelector('.music-icon');
             if (icon) icon.textContent = '🔊';
-            console.log('🎵 Tocando Matuê - 333 🔥');
+            console.log('🎵 Tocando Matuê 🔥');
         }).catch(err => {
             console.log('Clique no botão para ativar a música:', err);
-            // Se falhar, tenta novamente
-            if (audio) {
-                audio.play();
-            }
         });
     }
 }
@@ -119,7 +109,6 @@ function stopMusic() {
 function toggleMusic() {
     if (!audio) {
         initMusic();
-        // Pequeno delay para garantir que o áudio foi criado
         setTimeout(() => {
             playMusic();
         }, 100);
@@ -139,7 +128,7 @@ function toggleMusic() {
 function initQuiz() {
     currentQuestion = 0;
     score = 0;
-    timeLeft =  302.400;
+    timeLeft = 259200; // 3 DIAS
     quizActive = true;
     answerSelected = false;
     
@@ -271,7 +260,7 @@ function nextQuestion() {
     if (timerInterval) {
         clearInterval(timerInterval);
     }
-    timeLeft = 21;
+    timeLeft = 259200; // 3 DIAS para cada pergunta
     
     if (currentQuestion < QUESTIONS.length) {
         renderQuestion();
@@ -354,9 +343,18 @@ function renderResult() {
 }
 
 function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
+    const dias = Math.floor(seconds / 86400);
+    const horas = Math.floor((seconds % 86400) / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    
+    if (dias > 0) {
+        return `${dias}d ${horas.toString().padStart(2, '0')}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
+    } else if (horas > 0) {
+        return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
 }
 
 function escapeHtml(text) {
@@ -375,6 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
         musicBtn.addEventListener('click', toggleMusic);
     }
     
-    // Inicializar áudio (sem tocar automaticamente)
+    // Inicializar áudio
     initMusic();
 });
