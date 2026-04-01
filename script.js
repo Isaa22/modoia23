@@ -63,152 +63,77 @@ let answerSelected = false;
 // Elementos DOM
 const quizPanel = document.getElementById('quizPanel');
 
-// ========== SISTEMA DE MÚSICA ==========
-let audioContext = null;
+// ========== SISTEMA DE MÚSICA REAL DO MATUÊ ==========
+let audio = null;
 let isPlaying = false;
-let audioBuffer = null;
-let currentSource = null;
-let gainNode = null;
 
-// Função para criar uma melodia estilo trap/funk instrumental
-async function initMusic() {
-    try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Criar uma melodia simples mas estilosa (estilo trap/funk)
-        const sampleRate = audioContext.sampleRate;
-        const duration = 8; // 8 segundos de loop
-        const bufferSize = sampleRate * duration;
-        audioBuffer = audioContext.createBuffer(2, bufferSize, sampleRate);
-        
-        // Gerar som sintetizado estilo trap/funk
-        for (let channel = 0; channel < 2; channel++) {
-            const channelData = audioBuffer.getChannelData(channel);
-            
-            for (let i = 0; i < bufferSize; i++) {
-                const t = i / sampleRate; // tempo em segundos
-                
-                // BPM ~140 (estilo trap)
-                const beat = Math.floor(t * 140 / 60);
-                const beatPos = (t * 140 / 60) - beat;
-                
-                // Bass 808 (grave)
-                let bassFreq = 55; // A1
-                if (beat % 2 === 0 && beatPos < 0.3) {
-                    bassFreq = 55 * Math.pow(2, Math.floor(Math.random() * 3) - 1);
-                }
-                let bass = Math.sin(2 * Math.PI * bassFreq * t) * Math.exp(-t * 3) * 0.3;
-                
-                // Melodia principal (estilo trap)
-                let melody = 0;
-                const notes = [261.63, 293.66, 329.63, 349.23, 392.00]; // C4, D4, E4, F4, G4
-                const melodyPattern = [0, 1, 3, 2, 0, 4, 3, 2];
-                const melodyNote = notes[melodyPattern[Math.floor(t * 2) % melodyPattern.length]];
-                
-                if (Math.floor(t * 4) % 8 < 4) {
-                    melody = Math.sin(2 * Math.PI * melodyNote * t) * 0.15;
-                    melody += Math.sin(2 * Math.PI * melodyNote * 2 * t) * 0.05;
-                }
-                
-                // Hi-hats (ritmo)
-                let hihat = 0;
-                if (Math.floor(t * 8) % 4 === 0) {
-                    hihat = Math.random() * 0.1 * Math.exp(-t * 20);
-                }
-                
-                // Kick (bumbo)
-                let kick = 0;
-                if (beatPos < 0.1) {
-                    kick = Math.sin(2 * Math.PI * 60 * t) * Math.exp(-t * 15) * 0.25;
-                }
-                
-                // Snare (caixa) no beat 2 e 4
-                let snare = 0;
-                if (Math.abs(beatPos - 0.5) < 0.05 && (beat % 2 === 1)) {
-                    snare = Math.random() * 0.2;
-                }
-                
-                // Mixagem
-                let sample = bass + melody + kick + snare + hihat;
-                sample = Math.tanh(sample * 1.5); // saturação suave
-                
-                channelData[i] = sample;
-            }
-        }
-        
-        console.log('🎵 Música carregada! Clique no botão para ativar');
-    } catch (error) {
-        console.log('Erro ao carregar música:', error);
-    }
+function initMusic() {
+    // Criar elemento de áudio com música do Matuê
+    // OPÇÃO 1: Usar link do YouTube (embed) - Mais fácil para escola
+    // OPÇÃO 2: Baixar um trecho da música e colocar na pasta
+    
+    // Vamos usar um link de áudio do Matuê (você pode substituir pelo arquivo local)
+    // Para usar arquivo local: 'musicas/matue-333.mp3'
+    audio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3');
+    // ⚠️ SUBSTITUA O LINK ACIMA POR UMA MÚSICA REAL DO MATUÊ!
+    // Exemplo com arquivo local: audio = new Audio('matue-333.mp3');
+    
+    audio.loop = true;
+    audio.volume = 0.3;
+    
+    console.log('🎵 Música pronta! Clique no botão para tocar Matuê');
 }
 
 function playMusic() {
-    if (!audioContext || !audioBuffer) return;
-    
-    if (currentSource) {
-        try {
-            currentSource.stop();
-        } catch(e) {}
+    if (!audio) {
+        initMusic();
     }
     
-    currentSource = audioContext.createBufferSource();
-    currentSource.buffer = audioBuffer;
-    currentSource.loop = true;
-    
-    gainNode = audioContext.createGain();
-    gainNode.gain.value = 0.3; // volume ambiente
-    
-    currentSource.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    currentSource.start();
-    isPlaying = true;
-    
-    // Atualizar ícone
-    const icon = document.querySelector('.music-icon');
-    if (icon) icon.textContent = '🔊';
+    if (audio) {
+        audio.play().then(() => {
+            isPlaying = true;
+            const icon = document.querySelector('.music-icon');
+            if (icon) icon.textContent = '🔊';
+            console.log('🎵 Tocando Matuê - 333 🔥');
+        }).catch(err => {
+            console.log('Clique no botão para ativar a música:', err);
+            // Se falhar, tenta novamente
+            if (audio) {
+                audio.play();
+            }
+        });
+    }
 }
 
 function stopMusic() {
-    if (currentSource) {
-        try {
-            currentSource.stop();
-        } catch(e) {}
-        currentSource = null;
+    if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        isPlaying = false;
+        const icon = document.querySelector('.music-icon');
+        if (icon) icon.textContent = '🎵';
+        console.log('⏸️ Música pausada');
     }
-    isPlaying = false;
-    
-    const icon = document.querySelector('.music-icon');
-    if (icon) icon.textContent = '🔇';
 }
 
 function toggleMusic() {
-    if (!audioContext) {
-        initMusic().then(() => {
-            // Retomar contexto após interação do usuário
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
+    if (!audio) {
+        initMusic();
+        // Pequeno delay para garantir que o áudio foi criado
+        setTimeout(() => {
             playMusic();
-        });
+        }, 100);
         return;
     }
     
-    if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => {
-            if (isPlaying) {
-                stopMusic();
-            } else {
-                playMusic();
-            }
-        });
+    if (isPlaying) {
+        stopMusic();
     } else {
-        if (isPlaying) {
-            stopMusic();
-        } else {
-            playMusic();
-        }
+        playMusic();
     }
 }
+
+// ========== FUNÇÕES DO QUIZ ==========
 
 // Inicializar quiz
 function initQuiz() {
@@ -450,6 +375,6 @@ document.addEventListener('DOMContentLoaded', () => {
         musicBtn.addEventListener('click', toggleMusic);
     }
     
-    // Pré-carregar música (sem tocar automaticamente - respeita políticas de autoplay)
+    // Inicializar áudio (sem tocar automaticamente)
     initMusic();
 });
