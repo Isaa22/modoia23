@@ -27,7 +27,25 @@
         </footer>
     </div>
 
- 
+  <!-- No final do <body> -->
+<audio id="musicaFundo" src="audio.mp3" preload="auto"></audio>
+
+<button onclick="tocarMusica()" style="position:fixed; bottom:20px; right:20px;">
+  🎵 Ativar som
+</button>
+
+<script>
+function tocarMusica() {
+  var audio = document.getElementById("musicaFundo");
+  audio.play().then(() => {
+    console.log("Música tocando");
+  }).catch(erro => {
+    console.log("Erro ao tocar:", erro);
+    alert("Clique novamente se não tocar. Navegador pode exigir interação.");
+  });
+}
+</script>
     <script src="script.js"></script>
 </body>
+   
 </html>
