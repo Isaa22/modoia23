@@ -13,7 +13,7 @@ body {
     padding: 20px;
     position: relative;
     /* IMAGEM DE FUNDO - Substitua pela URL da sua imagem do Matuê */
-    background: url('images (16).jpg') center/cover fixed;
+    background: url('maxresdefault.jpg') center/cover fixed;
     background-attachment: fixed;
 }
 
