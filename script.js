@@ -60,7 +60,89 @@ let timerInterval = null;
 let quizActive = true;
 let answerSelected = false;
 
+// Estado da música
+let musicPlaying = false;
+let musicEnabled = false;
+
 const quizPanel = document.getElementById('quizPanel');
+const audio = document.getElementById('musicaFundo');
+const musicBtn = document.getElementById('playPauseBtn');
+
+// ========== FUNÇÕES DA MÚSICA ==========
+function initMusic() {
+    if (!audio) return;
+    
+    // Configurar áudio
+    audio.volume = 0.5;
+    audio.loop = true;
+    
+    // Tentar carregar o áudio
+    audio.load();
+    
+    // Adicionar evento para quando a página for interagida
+    document.body.addEventListener('click', function firstInteraction() {
+        if (!musicEnabled) {
+            // Não toca automático, só prepara
+            console.log('✅ Clique detectado - música pronta para ser ativada');
+        }
+        document.body.removeEventListener('click', firstInteraction);
+    });
+}
+
+function toggleMusic() {
+    if (!audio) return;
+    
+    if (musicPlaying) {
+        audio.pause();
+        musicPlaying = false;
+        musicBtn.innerHTML = '🎵 ATIVAR SOM';
+        musicBtn.classList.remove('playing');
+    } else {
+        // Tenta tocar a música
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                musicPlaying = true;
+                musicEnabled = true;
+                musicBtn.innerHTML = '🔊 SOM LIGADO';
+                musicBtn.classList.add('playing');
+                
+                // Mostrar feedback
+                showMusicFeedback(true);
+            }).catch(error => {
+                console.log('Erro ao tocar música:', error);
+                musicBtn.innerHTML = '🎵 CLIQUE AQUI';
+                showMusicFeedback(false);
+            });
+        }
+    }
+}
+
+function showMusicFeedback(success) {
+    const feedback = document.createElement('div');
+    feedback.style.position = 'fixed';
+    feedback.style.bottom = '80px';
+    feedback.style.right = '20px';
+    feedback.style.backgroundColor = success ? 'rgba(138, 43, 226, 0.95)' : 'rgba(255, 100, 100, 0.95)';
+    feedback.style.color = '#fff';
+    feedback.style.padding = '10px 20px';
+    feedback.style.borderRadius = '60px';
+    feedback.style.fontWeight = 'bold';
+    feedback.style.fontSize = '0.85rem';
+    feedback.style.zIndex = '1000';
+    feedback.style.backdropFilter = 'blur(8px)';
+    feedback.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+    feedback.textContent = success ? '🎵 30PRAUM no beat! 🔊' : '⚠️ Clique novamente para ativar o som';
+    
+    document.body.appendChild(feedback);
+    
+    setTimeout(() => {
+        feedback.style.opacity = '0';
+        feedback.style.transition = 'opacity 0.3s';
+        setTimeout(() => feedback.remove(), 300);
+    }, 2000);
+}
 
 // ========== FUNÇÕES DO QUIZ ==========
 
@@ -168,10 +250,21 @@ function showFeedback(isCorrect) {
     feedback.style.padding = '15px 30px';
     feedback.style.borderRadius = '60px';
     feedback.style.fontWeight = 'bold';
-    feedback.style.fontSize = '1.2rem';
+    feedback.style.fontSize = '1rem';
     feedback.style.zIndex = '1000';
     feedback.style.backdropFilter = 'blur(8px)';
     feedback.style.boxShadow = '0 5px 20px rgba(0,0,0,0.3)';
+    feedback.style.textAlign = 'center';
+    feedback.style.whiteSpace = 'nowrap';
+    
+    // Responsivo para mobile
+    if (window.innerWidth <= 480) {
+        feedback.style.fontSize = '0.8rem';
+        feedback.style.padding = '10px 20px';
+        feedback.style.whiteSpace = 'normal';
+        feedback.style.maxWidth = '80%';
+    }
+    
     feedback.textContent = isCorrect ? '✓ ACERTOU! +1 PRAUM' : '✗ ERROU! A VIDA É SOBRE APRENDER';
     
     document.body.appendChild(feedback);
@@ -283,17 +376,14 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Inicializar
+// ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', () => {
     initQuiz();
+    initMusic();
     
-    const musicBtn = document.getElementById('playPauseBtn');
     if (musicBtn) {
         musicBtn.addEventListener('click', toggleMusic);
     }
     
-    initMusic();
-    
-    // Mensagem amigável
-    console.log('✅ Site pronto! Clique no botão 🎵 para ativar a música');
+    console.log('✅ 30PRAUM Quiz carregado! Clique no botão 🎵 para ativar a música');
 });
