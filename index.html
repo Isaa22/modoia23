@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>30PRAUM | Matuê Experience</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,25 +27,16 @@
         </footer>
     </div>
 
-  <!-- No final do <body> -->
-<audio id="musicaFundo" src="audio.mp3" preload="auto"></audio>
+    <!-- Botão de música flutuante -->
+    <button class="music-btn" id="playPauseBtn">
+        🎵 ATIVAR SOM
+    </button>
 
-<button onclick="tocarMusica()" style="position:fixed; bottom:20px; right:20px;">
-  🎵 Ativar som
-</button>
+    <audio id="musicaFundo" loop preload="auto">
+        <source src="audio.mp3" type="audio/mpeg">
+        Seu navegador não suporta áudio.
+    </audio>
 
-<script>
-function tocarMusica() {
-  var audio = document.getElementById("musicaFundo");
-  audio.play().then(() => {
-    console.log("Música tocando");
-  }).catch(erro => {
-    console.log("Erro ao tocar:", erro);
-    alert("Clique novamente se não tocar. Navegador pode exigir interação.");
-  });
-}
-</script>
     <script src="script.js"></script>
 </body>
-   
 </html>
